@@ -6,8 +6,7 @@ configfile = open('userinfo.json', encoding='utf-8')
 userinfo = json.load(configfile)
 configfile.close()
 
-#模拟电脑浏览器请求头部
-#可能有些没用的参数，没有逐一测试
+#构造请求头部信息
 headers0 = {
 	'Connection': 'close',
 	'Cache-Control': 'max-age=0',
@@ -27,6 +26,8 @@ headers0 = {
 	'Accept-Language': 'zh-CN,zh;q=0.9'
 }
 
+print('[用户 '+userinfo['用户号']+' ]')
+
 #登录并获取ID
 login_headers = headers0
 login_headers['Referer'] += 'first0'	#修改Referer
@@ -40,8 +41,10 @@ login_response = requests.post('https://jksb.v.zzu.edu.cn:443/vls6sss/zzujksb.dl
 pos1 = login_response.text.find('ptopid=s')
 pos2 = login_response.text.find('&sid=')
 if pos1 == -1:	#无法获取ptopid
-	raise Exception('登录错误')	#抛出异常并退出
-ptopid = login_response.text[pos1+7:pos2]
+	raise Exception('登录失败')
+	#抛出异常并退出
+print('登录成功')
+ptopid = login_response.text[pos1+7:pos2]	#ptopid为认证登录信息的关键参数
 sid = login_response.text[pos2+5:pos2+23]	#从响应中截取ptopid与sid两个参数
 
 #请求填报页面
@@ -94,7 +97,7 @@ submit_data = {
 submit_response = requests.post('https://jksb.v.zzu.edu.cn:443/vls6sss/zzujksb.dll/jksb', headers=submit_headers, data=submit_data)
 
 #判断是否成功
-if submit_response.text.find('zzujksb.dll/endok') != -1:	#判断填报成功返回页
-	print('[成功] '+userinfo['用户号'])
+if submit_response.text.find('zzujksb.dll/endok') != -1:	#判断返回结果是否包含填报成功返回页
+	print('填报成功')
 else:
-	raise Exception('[失败] '+userinfo['用户号']+'，请手动检查')
+	raise Exception('发生未知错误，填报失败，请手动检查')
