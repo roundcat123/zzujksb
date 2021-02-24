@@ -26,7 +26,7 @@ headers0 = {
 	'Accept-Language': 'zh-CN,zh;q=0.9'
 }
 
-print('[用户 '+userinfo['用户号']+' ]')
+print('[用户'+userinfo['用户号']+']')
 
 #登录并获取ID
 login_headers = headers0
